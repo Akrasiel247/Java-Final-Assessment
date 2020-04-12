@@ -139,6 +139,7 @@ public class Client {
         Account depAcc = (Account) objFromServer.readObject();
 
         if (depAcc != null) {
+
             double oldBalance = depAcc.getAccountBalance();
             System.out.println("Please enter the amount you would like to deposit:");
             double depositMoney = in.nextDouble();

@@ -30,69 +30,18 @@ public class HandleClient extends Thread {
         keepRunning =true;
     }
 
-    private void displayAccounts() throws IOException {
-        String option = "";
-        while (!option.equals("x")){
-            System.out.println("Waiting for client response");
-            option = dataFromClient.readUTF();
-
-            switch (option){
-                //Search by account name
-                case "a":
-                case "A":
-                    System.out.println("Please enter the name to search by: ");
-                    String name = dataFromClient.readUTF();
-                    System.out.println("SEarch for account with name: "+ name);
-                    dataToClient.writeUTF(Arrays.toString(m_bank.searchByAccountName(name)));
-                    break;
-                 //search by final balance
-                case "b":
-                case "B":
-                    System.out.println("Please enter the balance to search by: ");
-                    String balanceS = dataFromClient.readUTF();
-                    double balance = Double.parseDouble(balanceS);
-                    System.out.println(balance);
-                    dataToClient.writeUTF(Arrays.toString(m_bank.searchByBalance(balance)));
-                    break;
-                 //get all accounts in bank
-                case "c":
-                case "C":
-                   dataToClient.writeUTF(Arrays.toString(m_bank.getAllAccounts()));
-                    break;
-
-                //search for a specific accoint
-                case "d":
-                case "D":
-                    System.out.println("Please enter the account number:");
-                    String acc_num = dataFromClient.readUTF();
-                    Account a= m_bank.searchByAccountNumber(acc_num);
-                    String result= a!=null? a.toString():"Account not found";
-                    dataToClient.writeUTF(result);
-                    break;
-
-                 //return to the main menu
-                case "x":
-                case "X":
-                    System.out.println("Operation cancelled, returning to main menu");
-                    break;
-                default:
-                    System.out.println("Invalid response, enter a valid response (a-d) or \"x\" to exit");
-                    break;
-            }
-        }
-
-    }
-
     private void openAcc(ObjectInputStream objFromClient) throws IOException, ClassNotFoundException {
-        System.out.println("Open an account");
-        //read account
+        //read account sent by client
         Account a = (Account) objFromClient.readObject();
-        String result = "unknown";
+
+        String result = "";
+
         if (m_bank.addAccount(a)) {
-            result="Account successfully included";
+            result=m_id+ ". Account successfully included";
         } else {
-            result= "Unable to add Account";
+            result= m_id+". Unable to add Account";
         }
+
         System.out.println(result);
         dataToClient.writeUTF(result);
         System.out.println(m_bank);
@@ -101,55 +50,56 @@ public class HandleClient extends Thread {
 
     private void closeAcc() throws IOException {
         String result="";
-        System.out.println("Close an account");
         //receive account num
         String acc_num = dataFromClient.readUTF();
+        //Attempt to delete the account from the bank
         Account del = m_bank.removeAccount(acc_num);
+
         if(del != null){
-            result =  "Account successfully deleted";
+            result=m_id+ ". Account successfully included";
         }else{
-            result="Account not found";
+            result= m_id+". Unable to add Account";
         }
+
         System.out.println(result);
         dataToClient.writeUTF(result);
         System.out.println(m_bank);
     }
 
     private void depositMoney(ObjectOutputStream objToClient) throws IOException{
-        System.out.println("Deposit money");
         String acc_num="";
-        //get accounnt num from client
+        //get account num from client
         acc_num = dataFromClient.readUTF();
+
         Account depositAcc = m_bank.searchByAccountNumber(acc_num);
+        //Send
         objToClient.writeObject(depositAcc);
 
         if(depositAcc!=null){
+            //get the deposit amount from client
             double depositAmount=0;
             depositAmount = dataFromClient.readDouble();
-            System.out.println(depositAmount);
+            System.out.println(m_id+". Has chosen to deposit: "+depositAmount+" into account#: "+depositAcc.getAccountNumber());
             depositAcc.deposit(depositAmount);
             dataToClient.writeDouble(depositAcc.getAccountBalance());
-            System.out.println("Final Balance: "+ depositAcc.getAccountBalance());
+            System.out.println(m_id+". Deposit Final Balance: "+ depositAcc.getAccountBalance());
 
         }
     }
 
     private void withdrawMoney() throws IOException{
         String acc_num="";
-        System.out.println("Withdraw money");
         //get account num from cliet
         acc_num = dataFromClient.readUTF();
         Account withdraw_Acc = m_bank.searchByAccountNumber(acc_num);
 
         if(withdraw_Acc!=null){
-            System.out.println("Initial amount"+withdraw_Acc.getAccountBalance());
-
             dataToClient.writeBoolean(true);
             dataToClient.writeDouble(withdraw_Acc.getAccountBalance());
             double draw_amount = dataFromClient.readDouble();
             boolean res = withdraw_Acc.withdraw(draw_amount);
             dataToClient.writeBoolean(res);
-            System.out.println("Final Amount"+withdraw_Acc.getAccountBalance());
+            System.out.println(m_id+ ". Final Amount"+withdraw_Acc.getAccountBalance());
 
             dataToClient.writeDouble(withdraw_Acc.getAccountBalance());
 
@@ -158,8 +108,60 @@ public class HandleClient extends Thread {
         }
     }
 
+    private void displayAccounts() throws IOException {
+        String option = "";
+        while (!option.equals("x")){
+            System.out.println(m_id +". Waiting for displayAccounts choice");
+            option = dataFromClient.readUTF();
+
+            switch (option){
+                //Search by account name
+                case "a":
+                case "A":
+                    String name = dataFromClient.readUTF();
+                    System.out.println(m_id +". Search for account with name: "+ name);
+                    dataToClient.writeUTF(Arrays.toString(m_bank.searchByAccountName(name)));
+                    break;
+                //search by final balance
+                case "b":
+                case "B":
+                    String balanceS = dataFromClient.readUTF();
+                    double balance = Double.parseDouble(balanceS);
+                    System.out.println(balance);
+                    System.out.println(m_id +". Search for account with balance: "+ balance);
+                    dataToClient.writeUTF(Arrays.toString(m_bank.searchByBalance(balance)));
+                    break;
+                //get all accounts in bank
+                case "c":
+                case "C":
+                    dataToClient.writeUTF(Arrays.toString(m_bank.getAllAccounts()));
+                    System.out.println(m_id +". Search for all accounts");
+                    break;
+
+                //search for a specific accoint
+                case "d":
+                case "D":
+                    String acc_num = dataFromClient.readUTF();
+                    Account a= m_bank.searchByAccountNumber(acc_num);
+                    System.out.println(m_id +". Search for account with number: "+acc_num);
+                    String result= a!=null? a.toString():"Account not found";
+                    dataToClient.writeUTF(result);
+                    break;
+
+                //return to the main menu
+                case "x":
+                case "X":
+                    System.out.println(m_id +". Operation cancelled, returning to main menu");
+                    break;
+                default:
+                    System.out.println(m_id +".Invalid response, enter a valid response (a-d) or \"x\" to exit");
+                    break;
+            }
+        }
+
+    }
+
     private void displayTax() throws IOException{
-        System.out.println("displayTax");
         String name = dataFromClient.readUTF();
         StringBuilder results= new StringBuilder();
 
@@ -171,15 +173,18 @@ public class HandleClient extends Thread {
                     results.append("Tax rate: " + (Taxable.tax_rate * 100) + "%\n");
                     results.append("Name: ").append(acc.getLastName()).append(", ").append(acc.getFirstName()).append("\n");
                 }
-                results.append("[").append(count++).append("]");
+                results.append("[").append(count++).append("]\n");
                 results.append(((GIC) acc).getTax());
             }
+            count=0;
         }
 
         dataToClient.writeUTF(String.valueOf(results));
 
 
     }
+
+
     private void clientMenuHandle() throws IOException, ClassNotFoundException {
         ObjectOutputStream objToClient = new ObjectOutputStream(m_connection.getOutputStream());
         ObjectInputStream objFromClient = new ObjectInputStream(m_connection.getInputStream());
