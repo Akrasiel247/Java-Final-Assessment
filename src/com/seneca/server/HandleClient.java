@@ -83,29 +83,34 @@ public class HandleClient extends Thread {
 
     }
 
-    private void getClientChoice() throws IOException, ClassNotFoundException {
+    public void openAcc(ObjectInputStream objFromClient) throws IOException, ClassNotFoundException {
+        System.out.println("Open an account");
+        //read account
+        Account a = (Account) objFromClient.readObject();
+        String result = "unknown";
+        if (m_bank.addAccount(a)) {
+            result="Account successfully included";
+        } else {
+            result= "Unable to add Account";
+        }
+        System.out.println(result);
+        dataToClient.writeUTF(result);
+        System.out.println(m_bank);
+
+    }
+
+    private void clientMenuHandle() throws IOException, ClassNotFoundException {
         ObjectOutputStream objToClient = new ObjectOutputStream(m_connection.getOutputStream());
         ObjectInputStream objFromClient = new ObjectInputStream(m_connection.getInputStream());
         int choice = 0;
 
         while (choice != 7){
             System.out.println("getting client choice");
-
+            String result="";
             choice = dataFromClient.readInt();
             switch (choice) {
                 case 1: //Open an account
-                    System.out.println("Open an account");
-                    //read account
-                    Account a = (Account) objFromClient.readObject();
-                    String result = "unknown";
-                    if (m_bank.addAccount(a)) {
-                        result="Account successfully included";
-                    } else {
-                        result= "Unable to add Account";
-                    }
-                    System.out.println(result);
-                    dataToClient.writeUTF(result);
-                    System.out.println(m_bank);
+                    openAcc(objFromClient);
                     break;
 
                 case 2: //Close an account
@@ -216,7 +221,7 @@ public class HandleClient extends Thread {
                 System.out.println(m_bank.getBankName() + "\n for client: "+ m_id);
                 //Send BankName
                 dataToClient.writeUTF(m_bank.getBankName());
-                getClientChoice();
+                clientMenuHandle();
 
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

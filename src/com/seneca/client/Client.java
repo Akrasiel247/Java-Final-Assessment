@@ -7,6 +7,7 @@ import com.seneca.business.Bank;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -259,7 +260,7 @@ public class Client {
 
     }
     public static void main(String[] args) {
-        Socket clientSocket;
+
 
         try{
 
@@ -354,6 +355,7 @@ public class Client {
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+
         }
     }
 

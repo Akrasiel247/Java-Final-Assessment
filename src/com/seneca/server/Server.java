@@ -18,7 +18,7 @@ public class Server {
 
     }
 
-    public static void main (String[] args){
+    public static void main (String[] args) throws InterruptedException {
         ServerSocket serverSocket;
         final int Port = 5678;
         final int Max_Clients = 3;
@@ -38,22 +38,20 @@ public class Server {
                 Thread client = new HandleClient(i+1, socketConnection,myBank);
                 clients.add(client);
                 client.start();
-                for(int j = 0 ; j<i; ++j){
-                    if(!clients.get(j).isAlive()){
-                        clients.get(j).join();
-                        System.out.println("This client is closing: "+ clients.get(j).getId());
 
-                    }
-                }
 
             }
 
+            for(int j = 0 ; j<Max_Clients; ++j){
+                clients.get(j).join();
+                System.out.println("This client is closing: "+ clients.get(j).getId());
+            }
 
 
-
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
 
         System.out.println("Closing Server");
     }
