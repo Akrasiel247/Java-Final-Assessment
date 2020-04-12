@@ -113,7 +113,7 @@ public class Account implements Serializable {
     /**
      * @return double returns the account balance
      */
-    public double getAccountBalance (){
+    public synchronized double getAccountBalance (){
         return m_balance.doubleValue();
     }
 

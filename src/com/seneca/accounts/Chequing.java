@@ -54,7 +54,7 @@ public class Chequing extends Account implements Serializable {
      * the total service charge has been subtracted from the account balance
      */
     @Override
-    public double getAccountBalance() {
+    public synchronized double getAccountBalance() {
         BigDecimal finalBalance = BigDecimal.valueOf(super.getAccountBalance()) ;
         finalBalance = finalBalance.subtract(m_total_charges);
         return finalBalance.doubleValue();
