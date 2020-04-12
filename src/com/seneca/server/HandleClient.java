@@ -134,6 +134,29 @@ public class HandleClient extends Thread {
         }
     }
 
+    private void withdrawMoney() throws IOException{
+        String acc_num="";
+        System.out.println("Withdraw money");
+        //get account num from cliet
+        acc_num = dataFromClient.readUTF();
+        Account withdraw_Acc = m_bank.searchByAccountNumber(acc_num);
+
+        if(withdraw_Acc!=null){
+            System.out.println("Initial amount"+withdraw_Acc.getAccountBalance());
+
+            dataToClient.writeBoolean(true);
+            dataToClient.writeDouble(withdraw_Acc.getAccountBalance());
+            double draw_amount = dataFromClient.readDouble();
+            boolean res = withdraw_Acc.withdraw(draw_amount);
+            dataToClient.writeBoolean(res);
+            System.out.println("Final Amount"+withdraw_Acc.getAccountBalance());
+
+            dataToClient.writeDouble(withdraw_Acc.getAccountBalance());
+
+        }else{
+            dataToClient.writeBoolean(false);
+        }
+    }
     private void clientMenuHandle() throws IOException, ClassNotFoundException {
         ObjectOutputStream objToClient = new ObjectOutputStream(m_connection.getOutputStream());
         ObjectInputStream objFromClient = new ObjectInputStream(m_connection.getInputStream());
@@ -147,39 +170,14 @@ public class HandleClient extends Thread {
                 case 1: //Open an account
                     openAcc(objFromClient);
                     break;
-
                 case 2: //Close an account
                     closeAcc();
                     break;
-
                 case 3: //Deposit Money
-
                     depositMoney(objToClient);
-
-
                     break;
                 case 4:
-                    System.out.println("Withdraw money");
-                    //get account num from cliet
-                    acc_num = dataFromClient.readUTF();
-                    Account withdraw_Acc = m_bank.searchByAccountNumber(acc_num);
-
-                    if(withdraw_Acc!=null){
-                        System.out.println("Initial amount"+withdraw_Acc.getAccountBalance());
-
-                        dataToClient.writeBoolean(true);
-                        dataToClient.writeDouble(withdraw_Acc.getAccountBalance());
-                        double draw_amount = dataFromClient.readDouble();
-                        boolean res = withdraw_Acc.withdraw(draw_amount);
-                        dataToClient.writeBoolean(res);
-                        System.out.println("Final Amount"+withdraw_Acc.getAccountBalance());
-
-                        dataToClient.writeDouble(withdraw_Acc.getAccountBalance());
-
-                    }else{
-                        dataToClient.writeBoolean(false);
-                    }
-
+                    withdrawMoney();
                     break;
                 case 5:
                     System.out.println("display Account");
