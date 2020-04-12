@@ -33,7 +33,7 @@ public class Server {
 
             for(int i = 0 ; i < Max_Clients; ++i){
                 Socket socketConnection = serverSocket.accept();
-                System.out.println("Accepted connection for client #"+ (i+1));
+                System.out.println("\nAccepted connection for client #"+ (i+1));
 
                 Thread client = new HandleClient(i+1, socketConnection,myBank);
                 clients.add(client);

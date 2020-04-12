@@ -256,7 +256,7 @@ public class Client {
         String name = in.nextLine();
         dataToServer.writeUTF(name);
         String results = dataFromServer.readUTF();
-        System.out.println(results);
+        System.out.println("\n"+ results);
 
 
     }
