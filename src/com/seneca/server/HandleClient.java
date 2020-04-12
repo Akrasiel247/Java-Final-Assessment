@@ -157,6 +157,29 @@ public class HandleClient extends Thread {
             dataToClient.writeBoolean(false);
         }
     }
+
+    private void displayTax() throws IOException{
+        System.out.println("displayTax");
+        String name = dataFromClient.readUTF();
+        StringBuilder results= new StringBuilder();
+
+        int count = 1;
+
+        for(Account acc: m_bank.getAllAccounts()){
+            if(acc instanceof GIC && acc.getFullName().equals(name)){
+                if(count == 1){
+                    results.append("Tax rate: " + (Taxable.tax_rate * 100) + "%\n");
+                    results.append("Name: ").append(acc.getLastName()).append(", ").append(acc.getFirstName()).append("\n");
+                }
+                results.append("[").append(count++).append("]");
+                results.append(((GIC) acc).getTax());
+            }
+        }
+
+        dataToClient.writeUTF(String.valueOf(results));
+
+
+    }
     private void clientMenuHandle() throws IOException, ClassNotFoundException {
         ObjectOutputStream objToClient = new ObjectOutputStream(m_connection.getOutputStream());
         ObjectInputStream objFromClient = new ObjectInputStream(m_connection.getInputStream());
@@ -184,26 +207,8 @@ public class HandleClient extends Thread {
                     displayAccounts();
                     break;
                 case 6:
-                    System.out.println("displayTax");
-                    String name = dataFromClient.readUTF();
-                    StringBuilder results= new StringBuilder();
 
-                    int count = 1;
-
-                    for(Account acc: m_bank.getAllAccounts()){
-                        if(acc instanceof GIC && acc.getFullName().equals(name)){
-                            if(count == 1){
-                                results.append("Tax rate: " + (Taxable.tax_rate * 100) + "%\n");
-                                results.append("Name: ").append(acc.getLastName()).append(", ").append(acc.getFirstName()).append("\n");
-                            }
-                            results.append("[").append(count++).append("]");
-                            results.append(((GIC) acc).getTax());
-                        }
-                    }
-
-                    dataToClient.writeUTF(String.valueOf(results));
-
-
+                    displayTax();
 
                     break;
                 case 7:
