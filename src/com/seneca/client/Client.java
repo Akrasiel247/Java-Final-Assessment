@@ -140,13 +140,11 @@ public class Client {
 
         if (depAcc != null) {
 
-            double oldBalance = depAcc.getAccountBalance();
             System.out.println("Please enter the amount you would like to deposit:");
             double depositMoney = in.nextDouble();
             dataToServer.writeDouble(depositMoney);
             System.out.println("Deposit Successful");
             double newBalance = dataFromServer.readDouble();
-            System.out.println("Old Balance: "+ nf.format(oldBalance));
             System.out.println("New Balance: " + nf.format(newBalance));
 
         } else {
@@ -167,7 +165,6 @@ public class Client {
         boolean valid_acc = dataFromServer.readBoolean();
 
         if (valid_acc) {
-            double oldBalance = dataFromServer.readDouble();
             System.out.println("Please enter the amount you would like to withdraw");
             double withdrawAmount = in.nextDouble();
             dataToServer.writeDouble(withdrawAmount);
@@ -175,7 +172,6 @@ public class Client {
             double newBalance= dataFromServer.readDouble();
             if (res) {
                 System.out.println("Withdraw successful");
-                System.out.println("Old Balance: "+ nf.format(oldBalance));
                 System.out.println("New Balance: " + nf.format(newBalance));
 
 
@@ -293,7 +289,6 @@ public class Client {
 
                     case 1: // Open an account - add GIC
 
-                        System.out.println("You have chosen Open Account");
                         dataToServer.writeInt(choice);
                         Account account = openAcc();
                         String result = "";
@@ -304,7 +299,6 @@ public class Client {
                     break;
 
                     case 2: // Close an account - Complete
-                        System.out.println("You have chosen Close Account");
                         String account_num = closeAcc();
                         dataToServer.writeInt(choice);
                         dataToServer.writeUTF(account_num);
@@ -313,26 +307,22 @@ public class Client {
 
                         break;
                     case 3:// Deposit money-Complete
-                        System.out.println("You have chosen deposit");
                         dataToServer.writeInt(choice);
                         depositMoney();
 
 
                         break;
                     case 4:// Withdraw money--Complete
-                        System.out.println("You have chosen withdraw");
                         dataToServer.writeInt(choice);
                         withdrawMoney();
 
                         break;
                     case 5:// Display accounts
-                        System.out.println("You have chosen display accoutbt");
                         dataToServer.writeInt(choice);
                         displayAccounts();
 
                         break;
                     case 6:// Display a tax statement
-                        System.out.println("You have chosen tax dtatsment");
                         dataToServer.writeInt(choice);
                         displayTax();
 
