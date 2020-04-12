@@ -30,7 +30,7 @@ public class HandleClient extends Thread {
         keepRunning =true;
     }
 
-    public void displayAccounts() throws IOException {
+    private void displayAccounts() throws IOException {
         String option = "";
         while (!option.equals("x")){
             System.out.println("Waiting for client response");
@@ -83,7 +83,7 @@ public class HandleClient extends Thread {
 
     }
 
-    public void openAcc(ObjectInputStream objFromClient) throws IOException, ClassNotFoundException {
+    private void openAcc(ObjectInputStream objFromClient) throws IOException, ClassNotFoundException {
         System.out.println("Open an account");
         //read account
         Account a = (Account) objFromClient.readObject();
@@ -97,6 +97,41 @@ public class HandleClient extends Thread {
         dataToClient.writeUTF(result);
         System.out.println(m_bank);
 
+    }
+
+    private void closeAcc() throws IOException {
+        String result="";
+        System.out.println("Close an account");
+        //receive account num
+        String acc_num = dataFromClient.readUTF();
+        Account del = m_bank.removeAccount(acc_num);
+        if(del != null){
+            result =  "Account successfully deleted";
+        }else{
+            result="Account not found";
+        }
+        System.out.println(result);
+        dataToClient.writeUTF(result);
+        System.out.println(m_bank);
+    }
+
+    private void depositMoney(ObjectOutputStream objToClient) throws IOException{
+        System.out.println("Deposit money");
+        String acc_num="";
+        //get accounnt num from client
+        acc_num = dataFromClient.readUTF();
+        Account depositAcc = m_bank.searchByAccountNumber(acc_num);
+        objToClient.writeObject(depositAcc);
+
+        if(depositAcc!=null){
+            double depositAmount=0;
+            depositAmount = dataFromClient.readDouble();
+            System.out.println(depositAmount);
+            depositAcc.deposit(depositAmount);
+            dataToClient.writeDouble(depositAcc.getAccountBalance());
+            System.out.println("Final Balance: "+ depositAcc.getAccountBalance());
+
+        }
     }
 
     private void clientMenuHandle() throws IOException, ClassNotFoundException {
@@ -114,36 +149,12 @@ public class HandleClient extends Thread {
                     break;
 
                 case 2: //Close an account
-                    System.out.println("Close an account");
-                    //receive account num
-                    String acc_num = dataFromClient.readUTF();
-                    Account del = m_bank.removeAccount(acc_num);
-                    if(del != null){
-                        result =  "Account successfully deleted";
-                    }else{
-                        result="Account not found";
-                    }
-                    System.out.println(result);
-                    dataToClient.writeUTF(result);
-                    System.out.println(m_bank);
+                    closeAcc();
                     break;
 
                 case 3: //Deposit Money
-                    System.out.println("Deposit money");
-                    //get accounnt num from client
-                    acc_num = dataFromClient.readUTF();
-                    Account depositAcc = m_bank.searchByAccountNumber(acc_num);
-                    objToClient.writeObject(depositAcc);
 
-                    if(depositAcc!=null){
-                        double depositAmount=0;
-                        depositAmount = dataFromClient.readDouble();
-                        System.out.println(depositAmount);
-                        depositAcc.deposit(depositAmount);
-                        dataToClient.writeDouble(depositAcc.getAccountBalance());
-                        System.out.println("Final Balance: "+ depositAcc.getAccountBalance());
-
-                    }
+                    depositMoney(objToClient);
 
 
                     break;
