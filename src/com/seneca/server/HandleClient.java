@@ -186,37 +186,42 @@ public class HandleClient extends Thread {
         int choice = 0;
 
         while (choice != 7){
-            System.out.println("getting client choice");
+            System.out.println(m_id+". Waiting for Client Menu Choice");
             String result="";
             choice = dataFromClient.readInt();
             switch (choice) {
                 case 1: //Open an account
+                    System.out.println(m_id+". Client has chosen to open an account");
                     openAcc(objFromClient);
                     break;
                 case 2: //Close an account
+                    System.out.println(m_id+". Client has chosen to close an account");
                     closeAcc();
                     break;
                 case 3: //Deposit Money
+                    System.out.println(m_id+". Client has chosen to deposit money into an account");
+
                     depositMoney(objToClient);
                     break;
                 case 4:
+                    System.out.println(m_id+". Client has chosen to withdraw money from an account");
+
                     withdrawMoney();
                     break;
                 case 5:
-                    System.out.println("display Account");
+                    System.out.println(m_id+". Client has chosen to display accounts");
                     displayAccounts();
                     break;
                 case 6:
-
+                    System.out.println(m_id+". Client has chosen to display tax statements");
                     displayTax();
-
                     break;
                 case 7:
-                    System.out.println("Exit");
+                    System.out.println(m_id+". Client has chosen to Exit");
                     StopRunning();
                     break;
                 default:
-                    System.out.println("Invalid choice");
+                    System.out.println(m_id+". Client has inputted an invalid menu choice");
                     //get input from client again
                     choice = 0;
             }
@@ -232,7 +237,7 @@ public class HandleClient extends Thread {
         while (keepRunning){
             try{
 
-                System.out.println(m_bank.getBankName() + "\n for client: "+ m_id);
+                System.out.println("Running HandleClient for client: "+ m_id);
                 //Send BankName
                 dataToClient.writeUTF(m_bank.getBankName());
                 clientMenuHandle();
