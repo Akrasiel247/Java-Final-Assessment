@@ -1,3 +1,4 @@
+package com.seneca.server;
 import com.seneca.accounts.Chequing;
 import com.seneca.accounts.GIC;
 import com.seneca.business.Bank;

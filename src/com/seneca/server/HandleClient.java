@@ -1,3 +1,4 @@
+package com.seneca.server;
 import com.seneca.accounts.Account;
 import com.seneca.accounts.GIC;
 import com.seneca.accounts.Taxable;

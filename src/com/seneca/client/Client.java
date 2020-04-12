@@ -1,3 +1,4 @@
+package com.seneca.client;
 import com.seneca.accounts.Account;
 import com.seneca.accounts.Chequing;
 import com.seneca.accounts.GIC;
