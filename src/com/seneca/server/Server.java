@@ -38,18 +38,23 @@ public class Server {
                 Thread client = new HandleClient(i+1, socketConnection,myBank);
                 clients.add(client);
                 client.start();
+                for(int j = 0 ; j<i; ++j){
+                    if(!clients.get(j).isAlive()){
+                        clients.get(j).join();
+                        System.out.println("This client is closing: "+ clients.get(j).getId());
+
+                    }
+                }
 
             }
 
-            for(int i = 0 ; i < Max_Clients; ++i){
-                clients.get(i).join();
-                System.out.println("This client is closing: "+ clients.get(i).getId());
-            }
+
 
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
+        System.out.println("Closing Server");
     }
 }
